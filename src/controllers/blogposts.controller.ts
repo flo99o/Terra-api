@@ -16,7 +16,7 @@ import { UpdateBlogPostDtoDto } from '../api-interfaces/blog-post-dto/dto/update
 
 
 @Controller()
-export class AppController {
+export class BlogpostController {
   constructor(
     private readonly postService: BlogPostService,
   ) { }
@@ -36,19 +36,20 @@ export class AppController {
   }
 
   @Put('blogpost/:id')
-    async updateBlogPostById(
-      @Param('id') id: number,
-      @Body() UpdateBlogPostDto: { post_title: string, post_content: string, post_author: string, post_duration: number, post_comment: string }
-  ): Promise<BlogPostModel>{
-    return this.postService.updateBlogPost({where: {id}, data:UpdateBlogPostDto})
+
+  async updateBlogPostById(
+
+    @Param('id') post_id: number,
+    @Body() UpdateBlogPostDto: { post_title: string, post_content: string, post_author: string, post_duration: number, post_comment: string }
+  ): Promise<BlogPostModel> {
+    return this.postService.updateBlogPost({ where: { post_id }, data: UpdateBlogPostDto })
   }
 
-@Delete('blogpost/:id')
-   async deleteBlogPostById(
-     @Param('id') id: number): Promise<BlogPostModel>{
-      return this.postService.deleteBlogPost({})
-     }
+  @Delete('blogpost/:id')
+  async deleteBlogPostById(
+    @Param('id') id: number): Promise<BlogPostModel> {
+    return this.postService.deleteBlogPost({})
+  }
 
 }
 
- 
