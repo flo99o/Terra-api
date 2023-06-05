@@ -66,5 +66,5 @@ model Users {
   user_id  Int     @id @default(autoincrement())
   email    String  @unique(map: "User_email_key")
   name     String?
-  password String  @db.VarChar(50)
+  password String  @db.VarChar(100)
 }

@@ -11,27 +11,41 @@ import {
     HttpStatus,
     HttpException
 } from '@nestjs/common';
+import { ApiProperty, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UserService } from '../prismaservices/user.service';
-import { Users as UserModel } from "@prisma/client"
+import { Prisma, Users as UserModel, Users } from "@prisma/client"
+import { CreateUserDto } from 'src/api-interfaces/create-user-dto/entities/create-user-dto.entity';
+import { hash } from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
-
-
-
-@Controller()
+@Controller('users')
 export class UserController {
     constructor(
         private readonly userService: UserService,
 
     ) { }
 
+    @Post()
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
 
-    @Post('user')
+                name: { type: 'string' },
+                email: { type: 'string' },
+                password: { type: 'string' },
+            },
+        },
+    })
     async signupUser(
-        @Body() CreateUserDto: { name: string, email: string, password: string })
-        : Promise<UserModel> {
+        @Body() CreateUserDto: CreateUserDto)
+        : Promise<Users> {
         try {
-            this.userService.createUser
+            const user = await this.userService.createUser(CreateUserDto)
+            console.log("User=", user)
+            return user;
         } catch (err) {
+            console.log(err)
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
                 mess: "Internal server error",
@@ -40,7 +54,6 @@ export class UserController {
                 cause: err,
             });
         }
-        return this.userService.createUser(CreateUserDto);
     }
 
 
@@ -67,13 +80,44 @@ export class UserController {
     }
 
     @Put('user/:id')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+
+                name: { type: 'string' },
+                email: { type: 'string' },
+                password: { type: 'string' },
+            },
+        },
+    })
     async updateUserById(
-        @Param('id') user_id: number,
+        @Param('id') user_id: string,
         @Body() UpdateCreateUserDto: { name: string, email: string, password: string, }
     ): Promise<UserModel> {
-        return this.userService.updateUser({ where: { user_id }, data: UpdateCreateUserDto })
+        try {
+            const { name, email, password } = UpdateCreateUserDto;
+            const updateData: Prisma.UsersUpdateInput = {};
+            if (name) updateData.name = name;
+            if (email) updateData.email = email;
+            if (password) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                updateData.password = hashedPassword;
+            }
+            return this.userService.updateUser({
+                user_id: user_id,
+                where: { user_id: +user_id },
+                data: updateData,
+            });
 
+        } catch (err) {
+            throw new HttpException({
+                status: HttpStatus.FORBIDDEN,
+                mess: "Internal server error",
+                error: 'This user could not be updated.',
+            }, HttpStatus.FORBIDDEN, {
+                cause: err,
+            });
+        }
     }
-
-
 }

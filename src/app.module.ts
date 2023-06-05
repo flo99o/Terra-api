@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { PrismaClient } from '@prisma/client';
+import { PrismaService } from './prismaservices/prisma.service';
 import { UserService } from './prismaservices/user.service';
 import { UserController } from './controllers/users.controller';
 import { CreateCreateUserDtoDto } from './api-interfaces/create-user-dto/dto/create-create-user-dto.dto';
@@ -10,9 +14,12 @@ import { RecipiesDto } from './api-interfaces/recipies-dto/entities/recipies-dto
 import { RecipesController } from './controllers/recipes.controller';
 
 
+
 @Module({
   imports: [CreateCreateUserDtoDto, BlogPostDto, RecipiesDto],
-  controllers: [UserController, BlogpostController,RecipesController],
-  providers: [UserService, BlogPostService,RecipesService],
+  controllers: [AppController,UserController, BlogpostController,RecipesController],
+  providers: [AppService,UserService, BlogPostService,RecipesService, PrismaService],
 })
+
+
 export class AppModule { }

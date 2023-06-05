@@ -17,8 +17,13 @@ import { Recipes as RecipesModel } from '@prisma/client';
 @Controller()
 export class RecipesController {
     constructor(
-        private readonly userService: RecipesService,
+        private readonly recipeService: RecipesService,
 
     ) { }
 
+
+
+
+
+    
     }

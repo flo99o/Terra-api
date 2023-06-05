@@ -1,14 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { CreateUserDtoService } from './create-user-dto.service';
-import { CreateCreateUserDtoDto } from './dto/create-create-user-dto.dto';
 import { UpdateCreateUserDtoDto } from './dto/update-create-user-dto.dto';
 
 @Controller('create-user-dto')
 export class CreateUserDtoController {
-  constructor(private readonly createUserDtoService: CreateUserDtoService) {}
+
+  constructor(private readonly createUserDtoService: CreateUserDtoService) { }
 
   @Post()
-  create(@Body() createCreateUserDtoDto:({name?: string, email: string, password: string})) {
+  create(@Body() createCreateUserDtoDto: ({ name?: string, email: string, password: string })) {
     return this.createUserDtoService.create(createCreateUserDtoDto);
   }
 
@@ -32,3 +32,4 @@ export class CreateUserDtoController {
     return this.createUserDtoService.remove(+id);
   }
 }
+
