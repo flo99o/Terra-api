@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { Recipes, Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecipesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async recipe(
     userWhereUniqueInput: Prisma.RecipesWhereUniqueInput,
@@ -32,22 +32,51 @@ export class RecipesService {
   }
 
   async createRecipe(data: Prisma.RecipesCreateInput): Promise<Recipes> {
-    return this.prisma.recipes.create({
-      data,
-    });
+    try {
+      const { recipe_name, ingredients, step, duration, side_note } = data
+      const post_duration = duration.toString()
+      const createRecipePost = await this.prisma.recipes.create({
+        data: {
+          recipe_name,
+          ingredients,
+          step,
+          duration: +post_duration,
+          side_note
+        }
+      })
+      console.log("recette", createRecipePost)
+      return createRecipePost
+    } catch (err) {
+
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: "la recette n'a pas pu être crée",
+          error: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
   }
 
   async updateRecipe(params: {
+    recipe_id: string,
     where: Prisma.RecipesWhereUniqueInput;
     data: Prisma.RecipesUpdateInput;
   }): Promise<Recipes> {
-    const { where, data } = params;
+    const {recipe_id, where, data } = params;
+    const existingRecipe = await this.prisma.recipes.findUnique({where:{recipe_id: +recipe_id}})
+   if(!existingRecipe){
+    throw new Error(`Recipe with ID ${recipe_id} not found`)
+   }
     return this.prisma.recipes.update({
       data,
       where,
     });
   }
 
+  
   async deleteRecipe(where: Prisma.RecipesWhereUniqueInput): Promise<Recipes> {
     return this.prisma.recipes.delete({
       where,

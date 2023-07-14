@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { BlogPost, Prisma } from '@prisma/client';
+
 
 
 
@@ -34,26 +35,57 @@ export class BlogPostService {
     });
   }
 
-  async createBlogPost(data: Prisma.BlogPostCreateInput): Promise<BlogPost> {
-    return this.prisma.blogPost.create({
-      data,
-    });
+  async createBlogPost( 
+    data: Prisma.BlogPostCreateInput): Promise<BlogPost> {
+   try{
+    const {post_title, post_content, post_author, post_duration, post_comment} = data
+   
+    const duration = post_duration.toString();   
+    const createBlogPost = await this.prisma.blogPost.create({
+      data: {
+       post_title,
+       post_comment,
+       post_author,
+       post_content,
+       post_duration: +duration
+      }
+    })
+    console.log('Nouveau blog',createBlogPost)
+    return createBlogPost;
+   }  catch(err){
+    throw new HttpException(
+      {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: "L'article n'a pas pu être crée",
+        error: err.message,
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+   }
+   
+  
   }
 
   async updateBlogPost(params: {
+    post_id : string,
     where: Prisma.BlogPostWhereUniqueInput;
     data: Prisma.BlogPostUpdateInput;
   }): Promise<BlogPost> {
-    const { where, data } = params;
+    const {post_id, where, data } = params;
+    const existingBlogPost = await this.prisma.blogPost.findUnique({where:{post_id: +post_id}})
+   if(!existingBlogPost){
+    throw new Error(`BlogPost with IG ${post_id} not found`)
+   }
     return this.prisma.blogPost.update({
       data,
       where,
     });
   }
 
+  
   async deleteBlogPost(where: Prisma.BlogPostWhereUniqueInput): Promise<BlogPost> {
     return this.prisma.blogPost.delete({
-      where,
+      where
     });
   }
 }
