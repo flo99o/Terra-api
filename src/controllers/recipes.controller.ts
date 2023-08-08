@@ -15,7 +15,8 @@ import { Recipes as RecipesModel, Prisma, Recipes } from '@prisma/client';
 import { ApiBody } from '@nestjs/swagger';
 import { UpdateBlogPostDtoDto } from '../api-interfaces/blog-post-dto/dto/update-blog-post-dto.dto';
 
-@Controller()
+
+@Controller('')
 export class RecipesController {
     constructor(
         private readonly recipeService: RecipesService,
@@ -24,31 +25,25 @@ export class RecipesController {
 
 
     @Get('recipes')
-    async getAllRecipes(@Param('id') id: string): Promise<RecipesModel>{
-        try{
-          this.recipeService
-        }catch (err){
-            throw new HttpException({
-                status: HttpStatus.FORBIDDEN,
-                mess: "Internal server error",
-                error: 'Failed to get all users. Please try again later.',
-            }, HttpStatus.FORBIDDEN, {
-                cause: err,
-            });
-
-        }
-        return this.recipeService.recipe({});
+    async getAllRecipes(@Param('id') id: string): Promise<RecipesModel[]>{    
+         return this.recipeService.recipes({});
     }
-   
+
+    @Get('recipe/:id')
+    async getRecipeById(@Param('id')recipe_id: string) : Promise<RecipesModel>{
+        return this.recipeService.findRecipeById(recipe_id)
+    }
+
     @Put('recipe/:id')
     async updateRecipeById(
         @Param('id') recipe_id: string,
-        @Body() UpdateBlogPostDtoDto: {recipe_name: string,ingredients:string,step:string,duration:string,side_note:string}
+        @Body() UpdateBlogPostDtoDto: {recipe_name: string,ingredients:string,step:string,duration:string,side_note:string, recipe_img:string}
     ): Promise<RecipesModel>{
         try{
-            const{ recipe_name,ingredients,step,duration,side_note} = UpdateBlogPostDtoDto
+            const{ recipe_name,recipe_img,ingredients,step,duration,side_note} = UpdateBlogPostDtoDto
             const updateData: Prisma.RecipesUpdateInput= {}
             if(recipe_name) updateData.recipe_name = recipe_name;
+            if(recipe_img)updateData.recipe_img= recipe_img
             if(ingredients)updateData.ingredients = ingredients;
             if(step)updateData.step = step
             if(duration)updateData.duration = +duration
@@ -97,6 +92,7 @@ export class RecipesController {
             type: 'object',
             properties: {
                 recipe_name: { type: 'string' },
+                recipe_img:{type: 'string'},
                 ingredients: { type: 'string' },
                 step: { type: 'string' },
                 duration: { type: 'string' },

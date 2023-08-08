@@ -20,6 +20,7 @@ model Admin {
 model BlogPost {
   post_id       Int    @id @default(autoincrement())
   post_title    String @db.VarChar(500)
+  post_img      String @db.Text
   post_content  String @db.Text
   post_author   String @db.VarChar(400)
   post_duration Int
@@ -42,6 +43,7 @@ model Favorite {
 model Recipes {
   recipe_id   Int    @id @default(autoincrement())
   recipe_name String @db.VarChar(300)
+  recipe_img  String @db.Text
   ingredients String @db.Text
   step        String @db.Text
   duration    Int

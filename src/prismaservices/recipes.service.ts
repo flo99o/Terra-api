@@ -30,14 +30,18 @@ export class RecipesService {
       orderBy,
     });
   }
-
+ async findRecipeById(recipe_id: string): Promise<Recipes>{
+  return this.prisma.recipes.findUnique({where:{recipe_id: +recipe_id}})
+ }
+ 
   async createRecipe(data: Prisma.RecipesCreateInput): Promise<Recipes> {
     try {
-      const { recipe_name, ingredients, step, duration, side_note } = data
+      const { recipe_name, ingredients, step, duration, side_note, recipe_img } = data
       const post_duration = duration.toString()
       const createRecipePost = await this.prisma.recipes.create({
         data: {
           recipe_name,
+          recipe_img,
           ingredients,
           step,
           duration: +post_duration,

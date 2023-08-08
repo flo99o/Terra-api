@@ -57,7 +57,7 @@ export class UserController {
 
 
     @Get('users')
-    async getAllUser(@Param('id') id: number): Promise<UserModel[]> {
+    async getAllUser(@Param('id') user_id: number): Promise<UserModel[]> {
         try {
             this.userService
         } catch (err) {
