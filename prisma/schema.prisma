@@ -18,55 +18,134 @@ model Admin {
 }
 
 model BlogPost {
-  post_id       Int    @id @default(autoincrement())
-  post_title    String @db.VarChar(500)
-  post_img      String @db.Text
-  post_content  String @db.Text
-  post_author   String @db.VarChar(400)
+  post_id       Int          @id @default(autoincrement())
+  post_title    String       @db.VarChar(500)
+  post_img      String       @db.Text
+  post_content  String       @db.Text
+  post_author   String       @db.VarChar(400)
   post_duration Int
-  post_comment  String @db.Text
+  post_comment  String       @db.Text
+  blog_tags     blog_tags[]
+  users_blog    users_blog[]
 }
 
 model Category {
-  category_id Int    @id @default(autoincrement())
-  name        String @db.VarChar(300)
-}
-
-model FavProduct {
-  favorite_product_id Int @id @default(autoincrement())
-}
-
-model Favorite {
-  favorite_id Int @id @default(autoincrement())
+  category_id      Int                @id @default(autoincrement())
+  name             String             @db.VarChar(300)
+  recipes_category recipes_category[]
 }
 
 model Recipes {
-  recipe_id   Int    @id @default(autoincrement())
-  recipe_name String @db.VarChar(300)
-  recipe_img  String @db.Text
-  ingredients String @db.Text
-  step        String @db.Text
-  duration    Int
-  side_note   String @db.Text
-}
-
-model ShopOrder {
-  order_id Int @id @default(autoincrement())
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model ShopProduct {
-  product_id    Int
-  product_name  Int
-  product_price Int
-  product_image Int
-
-  @@ignore
+  recipe_id        Int                @id @default(autoincrement())
+  recipe_name      String             @db.VarChar(300)
+  recipe_img       String             @db.Text
+  ingredients      String             @db.Text
+  step             String             @db.Text
+  duration         Int
+  side_note        String             @db.Text
+  recipes_category recipes_category[]
+  recipes_tags     recipes_tags[]
+  users_recipes    users_recipes[]
 }
 
 model Users {
-  user_id  Int     @id @default(autoincrement())
-  email    String  @unique(map: "User_email_key")
-  name     String?
-  password String  @db.VarChar(100)
+  user_id       Int             @id @default(autoincrement())
+  email         String          @unique(map: "User_email_key")
+  name          String?
+  password      String          @db.VarChar(100)
+  userType      String          @db.VarChar(300)
+  blog_id       Int
+  Orders        Orders[]
+  users_blog    users_blog[]
+  users_recipes users_recipes[]
+}
+
+model Orders {
+  order_id      Int             @id @default(autoincrement())
+  date          DateTime?       @db.Date
+  user_id       Int?
+  Users         Users?          @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "Orders_ibfk_1")
+  order_product order_product[]
+
+  @@index([user_id], map: "user_id")
+}
+
+model Products {
+  product_id    Int             @id @default(autoincrement())
+  product_name  String          @db.VarChar(300)
+  product_price Int
+  product_image String          @db.VarChar(1000)
+  order_product order_product[]
+}
+
+model Tags {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(150)
+  blog_tags    blog_tags[]
+  recipes_tags recipes_tags[]
+}
+
+model blog_tags {
+  id       Int      @id @default(autoincrement())
+  post_id  Int
+  tags_id  Int
+  BlogPost BlogPost @relation(fields: [post_id], references: [post_id], onDelete: NoAction, onUpdate: NoAction, map: "blog_tags_ibfk_1")
+  Tags     Tags     @relation(fields: [tags_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_tags_ibfk_2")
+
+  @@index([post_id], map: "post_id")
+  @@index([tags_id], map: "tags_id")
+}
+
+model order_product {
+  order_id   Int
+  product_id Int
+  Orders     Orders   @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction, map: "order_product_ibfk_1")
+  Products   Products @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction, map: "order_product_ibfk_2")
+
+  @@id([order_id, product_id])
+  @@index([product_id], map: "product_id")
+}
+
+model recipes_category {
+  id          Int      @id @default(autoincrement())
+  category_id Int
+  recipes_id  Int
+  Category    Category @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "recipes_category_ibfk_1")
+  Recipes     Recipes  @relation(fields: [recipes_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "recipes_category_ibfk_2")
+
+  @@index([category_id], map: "category_id")
+  @@index([recipes_id], map: "recipes_id")
+}
+
+model recipes_tags {
+  id         Int     @id @default(autoincrement())
+  tag_id     Int
+  recipes_id Int
+  Tags       Tags    @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recipes_tags_ibfk_1")
+  Recipes    Recipes @relation(fields: [recipes_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "recipes_tags_ibfk_2")
+
+  @@index([recipes_id], map: "recipes_id")
+  @@index([tag_id], map: "tag_id")
+}
+
+model users_blog {
+  id       Int       @id @default(autoincrement())
+  user_id  Int?
+  blog_id  Int?
+  Users    Users?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "users_blog_ibfk_1")
+  BlogPost BlogPost? @relation(fields: [blog_id], references: [post_id], onDelete: NoAction, onUpdate: NoAction, map: "users_blog_ibfk_2")
+
+  @@index([blog_id], map: "blog_id")
+  @@index([user_id], map: "user_id")
+}
+
+model users_recipes {
+  id         Int     @id @default(autoincrement())
+  users_id   Int
+  recipes_id Int
+  Users      Users   @relation(fields: [users_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "users_recipes_ibfk_1")
+  Recipes    Recipes @relation(fields: [recipes_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "users_recipes_ibfk_2")
+
+  @@index([recipes_id], map: "recipes_id")
+  @@index([users_id], map: "users_id")
 }
