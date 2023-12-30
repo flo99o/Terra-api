@@ -32,6 +32,7 @@ export class BlogpostController {
         post_author: { type: 'string' },
         post_content: { type: 'string' },
         post_duration: { type: 'string' },
+        
 
       },
     },
@@ -39,6 +40,7 @@ export class BlogpostController {
   async createBlogPost(
     @Body() data: any): Promise<BlogPost> {
     try {
+      data.post_date = new Date()
       const blogPost = await this.postService.createBlogPost(data)
       // console.log(blogPost)
       return blogPost

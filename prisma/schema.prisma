@@ -25,6 +25,7 @@ model BlogPost {
   post_author   String       @db.VarChar(400)
   post_duration Int
   post_comment  String       @db.Text
+  post_date     DateTime     @default(now()) @db.DateTime(0)
   blog_tags     blog_tags[]
   users_blog    users_blog[]
 }

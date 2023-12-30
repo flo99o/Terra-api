@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  const port = process.env.PORT || 4000
   const config = new DocumentBuilder()
     .setTitle('Terra API')
     .setDescription('API documentation for Terra')
@@ -16,6 +18,8 @@ async function bootstrap() {
     origin: '*',
 });
 
-  await app.listen(4000);
+  await app.listen(port, () =>{
+    console.log(`App listening on port: ${port}`);
+  });
 }
 bootstrap();

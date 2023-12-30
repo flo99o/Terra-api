@@ -42,7 +42,7 @@ export class BlogPostService {
   async createBlogPost(
     data: Prisma.BlogPostCreateInput): Promise<BlogPost> {
     try {
-      const { post_title, post_content, post_img, post_author, post_duration, post_comment } = data
+      const { post_title, post_content, post_img, post_author, post_duration, post_comment, post_date } = data
 
       const duration = post_duration.toString();
   console.log(this.prisma.blogPost)
@@ -54,7 +54,8 @@ export class BlogPostService {
           post_comment,
           post_author,
           post_content,
-          post_duration: +duration
+          post_duration: +duration,
+          post_date,
         }
       })
       // console.log('Nouveau blog', createBlogPost)
