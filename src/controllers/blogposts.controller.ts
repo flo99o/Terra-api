@@ -33,18 +33,17 @@ export class BlogpostController {
         post_content: { type: 'string' },
         post_duration: { type: 'string' },
         
-
       },
     },
   })
   async createBlogPost(
-    @Body() data: any): Promise<BlogPost> {
+    @Body() data: any): Promise<BlogPostModel> {
     try {
       data.post_date = new Date()
       const blogPost = await this.postService.createBlogPost(data)
-      // console.log(blogPost)
       return blogPost
     } catch (err) {
+      console.log("error:",err)
       throw new HttpException({
         status: HttpStatus.FORBIDDEN,
         mess: "Internal server error",

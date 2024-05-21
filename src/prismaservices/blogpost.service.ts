@@ -43,10 +43,7 @@ export class BlogPostService {
     data: Prisma.BlogPostCreateInput): Promise<BlogPost> {
     try {
       const { post_title, post_content, post_img, post_author, post_duration, post_comment, post_date } = data
-
       const duration = post_duration.toString();
-  console.log(this.prisma.blogPost)
-  console.log('data',data)
       const createBlogPost = await this.prisma.blogPost.create({
         data: {
           post_title,

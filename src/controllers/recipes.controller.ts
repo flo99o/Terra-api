@@ -25,63 +25,64 @@ export class RecipesController {
 
 
     @Get('recipes')
-    async getAllRecipes(@Param('id') id: string): Promise<RecipesModel[]>{    
-         return this.recipeService.recipes({});
+    async getAllRecipes(@Param('id') id: string): Promise<RecipesModel[]> {
+        return this.recipeService.recipes({});
     }
 
     @Get('recipe/:id')
-    async getRecipeById(@Param('id')recipe_id: string) : Promise<RecipesModel>{
+    async getRecipeById(@Param('id') recipe_id: string): Promise<RecipesModel> {
         return this.recipeService.findRecipeById(recipe_id)
     }
 
     @Put('recipe/:id')
-    async updateRecipeById(
+    updateRecipeById(
         @Param('id') recipe_id: string,
-        @Body() UpdateBlogPostDtoDto: {recipe_name: string,ingredients:string,step:string,duration:string,side_note:string, recipe_img:string}
-    ): Promise<RecipesModel>{
-        try{
-            const{ recipe_name,recipe_img,ingredients,step,duration,side_note} = UpdateBlogPostDtoDto
-            const updateData: Prisma.RecipesUpdateInput= {}
-            if(recipe_name) updateData.recipe_name = recipe_name;
-            if(recipe_img)updateData.recipe_img= recipe_img
-            if(ingredients)updateData.ingredients = ingredients;
-            if(step)updateData.step = step
-            if(duration)updateData.duration = +duration
-            if(side_note)updateData.side_note= side_note
+        @Body() UpdateBlogPostDtoDto: { recipe_name: string, ingredients: string, step: string, duration: string, side_note: string, recipe_img: string }
+    ): Promise<RecipesModel> {
+        try {
+            const { recipe_name, recipe_img, ingredients, step, duration, side_note } = UpdateBlogPostDtoDto
+            const updateData: Prisma.RecipesUpdateInput = {}
+            if (recipe_name) updateData.recipe_name = recipe_name;
+            if (recipe_img) updateData.recipe_img = recipe_img
+            if (ingredients) updateData.ingredients = ingredients;
+            if (step) updateData.step = step
+            if (duration) updateData.duration = +duration
+            if (side_note) updateData.side_note = side_note
             return this.recipeService.updateRecipe({
                 recipe_id: recipe_id,
-                where:{recipe_id: +recipe_id},
+                where: { recipe_id: +recipe_id },
                 data: updateData
             })
-
-        } catch(err){
+        } catch (err) {
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
                 mess: "Internal server error",
                 error: 'Cette recette n\'a pas pu être modifié.',
-              }, HttpStatus.FORBIDDEN, {
+            }, HttpStatus.FORBIDDEN, {
                 cause: err,
-              });
+            });
 
         }
-    
+
     }
-   @Delete('recipes/:id')
-   async deleteRecipeBtId(
-    @Param('id') recipe_id: string) : Promise<Recipes>{
-        try{
+
+    
+    @Delete('recipe/:id')
+    async deleteRecipeBtId(
+        @Param('id') recipe_id: string): Promise<Recipes> {
+        try {
             return this.recipeService.deleteRecipe({
                 recipe_id: +recipe_id
             })
 
-        }catch(err){
+        } catch (err) {
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
                 mess: "Internal server error",
                 error: 'Cette recette n\'a pas pu être trouvé.',
-              }, HttpStatus.FORBIDDEN, {
+            }, HttpStatus.FORBIDDEN, {
                 cause: err,
-              });
+            });
         }
     }
 
@@ -92,7 +93,7 @@ export class RecipesController {
             type: 'object',
             properties: {
                 recipe_name: { type: 'string' },
-                recipe_img:{type: 'string'},
+                recipe_img: { type: 'string' },
                 ingredients: { type: 'string' },
                 step: { type: 'string' },
                 duration: { type: 'string' },
@@ -103,9 +104,11 @@ export class RecipesController {
     })
     async createRecipe(
         @Body() data: any): Promise<RecipesModel> {
+        console.log(data);
         try {
-            const recipePost = await this.recipeService.createRecipe(data)
+            const recipePost = await this.recipeService.createRecipe(data);
             console.log(recipePost)
+            console.log('Received data in controller:', data);
             return recipePost
         } catch (err) {
             console.log(err)
@@ -118,6 +121,8 @@ export class RecipesController {
             });
 
         }
-    }   
+
+    }
+
 }
 

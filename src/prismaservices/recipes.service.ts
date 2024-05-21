@@ -51,7 +51,6 @@ export class RecipesService {
       console.log("recette", createRecipePost)
       return createRecipePost
     } catch (err) {
-
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
