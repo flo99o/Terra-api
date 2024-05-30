@@ -13,6 +13,7 @@ import {
 import { BlogPostService } from 'src/prismaservices/blogpost.service';
 import { Prisma, BlogPost as BlogPostModel, BlogPost } from '@prisma/client';
 import { ApiBody } from '@nestjs/swagger';
+import * as sanitizeHtml from 'sanitize-html';
 
 
 @Controller('')
@@ -39,6 +40,7 @@ export class BlogpostController {
   async createBlogPost(
     @Body() data: any): Promise<BlogPostModel> {
     try {
+      data.post_content = sanitizeHtml(data.post_content)
       data.post_date = new Date()
       const blogPost = await this.postService.createBlogPost(data)
       return blogPost
@@ -76,7 +78,7 @@ export class BlogpostController {
       if (post_title) updateData.post_title = post_title;
       if (post_img) updateData.post_img = post_img;
       if (post_author) updateData.post_author = post_author;
-      if (post_content) updateData.post_content = post_content;
+      if (post_content) updateData.post_content = sanitizeHtml(post_content);
       if (post_duration) updateData.post_duration = +post_duration;
       return this.postService.updateBlogPost({
         post_id: post_id,
